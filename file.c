@@ -4368,6 +4368,7 @@ rb_file_s_dirname(VALUE klass, VALUE fname)
 VALUE
 rb_file_dirname(VALUE fname)
 {
+    int tainted = 0;
     const char *name, *root, *p, *end;
     VALUE dirname;
     rb_encoding *enc;
@@ -4388,8 +4389,12 @@ rb_file_dirname(VALUE fname)
     if (!p) {
 	p = root;
     }
-    if (p == name)
-	return rb_usascii_str_new2(".");
+    if (p == name) {
+	dirname = rb_usascii_str_new2(".");
+	tainted = OBJ_TAINTED_RAW(fname);
+	if (tainted) OBJ_TAINT(dirname);
+	return dirname;
+    }
 #ifdef DOSISH_DRIVE_LETTER
     if (has_drive_letter(name) && isdirsep(*(name + 2))) {
 	const char *top = skiproot(name + 2, end, enc);
