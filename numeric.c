@@ -4850,6 +4850,47 @@ rb_int_digits(int argc, VALUE *argv, VALUE num)
     return Qnil;
 }
 
+inline static long
+i_gcd(long x, long y) // from rational.c
+{
+    unsigned long u, v, t;
+    int shift;
+
+    if (x < 0)
+	x = -x;
+    if (y < 0)
+	y = -y;
+
+    if (x == 0)
+	return y;
+    if (y == 0)
+	return x;
+
+    u = (unsigned long)x;
+    v = (unsigned long)y;
+    for (shift = 0; ((u | v) & 1) == 0; ++shift) {
+	u >>= 1;
+	v >>= 1;
+    }
+
+    while ((u & 1) == 0)
+	u >>= 1;
+
+    do {
+	while ((v & 1) == 0)
+	    v >>= 1;
+
+	if (u > v) {
+	    t = v;
+	    v = u;
+	    u = t;
+	}
+	v = v - u;
+    } while (v != 0);
+
+    return (long)(u << shift);
+}
+
 /*
   # Returns true if +self+ is a prime number, else returns false.
   def prime?
@@ -4865,8 +4906,19 @@ rb_int_digits(int argc, VALUE *argv, VALUE num)
   end
 */
 static VALUE
-rb_int_prime_p(VALUE self)
+rb_int_prime_p(VALUE x)
 {
+    long i;
+    long self = FIX2LONG(x);
+    if (self <= 3) return self >= 2 ? Qtrue : Qfalse;
+    if (self == 5) return Qtrue;
+    if (i_gcd(30L, self) == 1) return Qfalse;
+    for(i = 7L; i * i <= self; i += 30) {
+	if (self % i == 0 || self % (i+4) == 0 || self % (i+6) == 0 || self % (i+10) == 0 ||
+	    self%(i+12) == 0 || self%(i+16) == 0 || self%(i+22) == 0 || self%(i+24) == 0) {
+	    return Qfalse;
+	}
+    }
     return Qtrue;
 }
 
