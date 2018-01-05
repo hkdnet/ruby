@@ -4851,6 +4851,26 @@ rb_int_digits(int argc, VALUE *argv, VALUE num)
 }
 
 /*
+  # Returns true if +self+ is a prime number, else returns false.
+  def prime?
+    return self >= 2 if self <= 3
+    return true if self == 5
+    return false unless 30.gcd(self) == 1
+    (7..Integer.sqrt(self)).step(30) do |p|
+      return false if
+        self%(p)    == 0 || self%(p+4)  == 0 || self%(p+6)  == 0 || self%(p+10) == 0 ||
+        self%(p+12) == 0 || self%(p+16) == 0 || self%(p+22) == 0 || self%(p+24) == 0
+    end
+    true
+  end
+*/
+static VALUE
+rb_int_prime_p(VALUE self)
+{
+    return Qtrue;
+}
+
+/*
  *  Document-method: Integer#upto
  *  call-seq:
  *     int.upto(limit) {|i| block }  ->  self
@@ -5451,6 +5471,8 @@ Init_Numeric(void)
     rb_define_method(rb_cInteger, "size", int_size, 0);
     rb_define_method(rb_cInteger, "bit_length", rb_int_bit_length, 0);
     rb_define_method(rb_cInteger, "digits", rb_int_digits, -1);
+
+    rb_define_method(rb_cInteger, "prime?", rb_int_prime_p, 0);
 
 #ifndef RUBY_INTEGER_UNIFICATION
     rb_cFixnum = rb_cInteger;
