@@ -4444,8 +4444,10 @@ rb_ary_uniq_bang(VALUE ary)
     rb_ary_modify_check(ary);
     if (RARRAY_LEN(ary) <= 1)
         return Qnil;
-    if (rb_block_given_p())
+    if (rb_block_given_p()) {
 	hash = ary_make_hash_by(ary);
+	rb_ary_modify_check(ary);
+    }
     else
 	hash = ary_make_hash(ary);
 
@@ -4453,7 +4455,6 @@ rb_ary_uniq_bang(VALUE ary)
     if (RARRAY_LEN(ary) == hash_size) {
 	return Qnil;
     }
-    rb_ary_modify_check(ary);
     ARY_SET_LEN(ary, 0);
     if (ARY_SHARED_P(ary) && !ARY_EMBED_P(ary)) {
 	rb_ary_unshare(ary);
