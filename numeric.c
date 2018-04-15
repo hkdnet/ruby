@@ -4628,10 +4628,8 @@ static VALUE
 fix_abs(VALUE fix)
 {
     long i = FIX2LONG(fix);
-
-    if (i < 0) i = -i;
-
-    return LONG2NUM(i);
+    long x = i >> (sizeof(long) - 1);
+    return LONG2NUM((i ^ x) - x);
 }
 
 VALUE
