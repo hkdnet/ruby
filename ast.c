@@ -479,6 +479,7 @@ rb_ast_node_inspect(VALUE self)
 static VALUE
 node_extrainfo(rb_ast_t *ast, NODE *node)
 {
+    VALUE ret;
     enum node_type type = nd_type(node);
     switch (type) {
       case NODE_BLOCK:
@@ -579,7 +580,9 @@ node_extrainfo(rb_ast_t *ast, NODE *node)
       case NODE_OPCALL:
 	// return rb_ary_new_from_node_args(ast, 2, node->nd_recv, node->nd_args);
       case NODE_FCALL:
-        return ID2SYM(node->nd_mid);
+        ret = rb_hash_new();
+        rb_hash_add_new_element(ret, ID2SYM(rb_intern("mid")), ID2SYM(node->nd_mid));
+        return ret;
 	// return rb_ary_new_from_node_args(ast, 1, node->nd_args);
       case NODE_VCALL:
 	// return rb_ary_new_from_node_args(ast, 0);
