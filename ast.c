@@ -579,6 +579,7 @@ node_extrainfo(rb_ast_t *ast, NODE *node)
       case NODE_OPCALL:
 	// return rb_ary_new_from_node_args(ast, 2, node->nd_recv, node->nd_args);
       case NODE_FCALL:
+        return ID2SYM(node->nd_mid);
 	// return rb_ary_new_from_node_args(ast, 1, node->nd_args);
       case NODE_VCALL:
 	// return rb_ary_new_from_node_args(ast, 0);
